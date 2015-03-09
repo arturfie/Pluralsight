@@ -7,16 +7,19 @@
 // 
 // See the License for the specific language governing permissions
 // and limitations under the License.
+
+
 namespace AdgisticsMotorsReport
 {
     using System;
     using System.Threading;
     using System.Web;
+    using Interfaces;
 
     /// <summary>
     /// Delearship Service class used to make "web service" requests to fetch the data for dealerships.
     /// </summary>
-    public sealed class DealershipService
+    public sealed class DealershipService : IDealershipService
     {
         private static readonly Random random = new Random();
 

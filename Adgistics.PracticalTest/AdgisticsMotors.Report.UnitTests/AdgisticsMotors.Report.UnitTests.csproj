@@ -44,12 +44,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Web\Services\TestReportsService.cs" />
     <Compile Include="TestBackgroundWorkerQueue.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AdgisticsMotors.Report\AdgisticsMotors.Report.csproj">
       <Project>{d6ff11ca-24ab-4775-8d5d-bcbb15373cb1}</Project>
       <Name>AdgisticsMotors.Report</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AdgisticsMotors.Web\AdgisticsMotors.Web.csproj">
+      <Project>{7365a78c-56dd-4add-887b-f810d54d5f6c}</Project>
+      <Name>AdgisticsMotors.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
