@@ -14,12 +14,11 @@ namespace AdgisticsMotorsReport
     using System;
     using System.Threading;
     using System.Web;
-    using Interfaces;
 
     /// <summary>
     /// Delearship Service class used to make "web service" requests to fetch the data for dealerships.
     /// </summary>
-    public sealed class DealershipService : IDealershipService
+    public sealed class DealershipService
     {
         private static readonly Random random = new Random();
 

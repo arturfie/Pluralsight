@@ -29,8 +29,8 @@ namespace AdgisticsMotors.Web.Controllers
 
         public ActionResult TopPerformingDealerShips()
         {
-            _reportsService.TopPerformingDealerships();
-            return View();
+            var model = _reportsService.TopPerformingDealerships();
+            return View(model);
         }
 
         public ActionResult LowStockDealerShips()
