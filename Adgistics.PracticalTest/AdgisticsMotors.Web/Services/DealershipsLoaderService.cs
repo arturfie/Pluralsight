@@ -9,17 +9,19 @@ namespace AdgisticsMotors.Web.Services
 {
     public class DealershipsLoaderService : IDealershipsLoaderService
     {
+        public Exception Exception { get; set; }
         public IList<DealershipInfo> LoadServices()
         {
             IList<DealershipInfo> dealershipList = new List<DealershipInfo>();
 
             foreach (string line in File.ReadLines(AppDomain.CurrentDomain.SetupInformation.PrivateBinPath + "\\DealershipsList.txt"))
             {
-                if (dealershipList.Count() > 1000)
+                if (dealershipList.Count() > 100)
                 {
                     break;
                 }
                 var lineSplited = line.Split(',');
+
                 dealershipList.Add(new DealershipInfo(lineSplited[0], new Uri(lineSplited[1])));
             }
 

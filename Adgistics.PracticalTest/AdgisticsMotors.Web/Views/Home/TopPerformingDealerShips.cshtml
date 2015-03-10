@@ -1,14 +1,29 @@
 ﻿@model IList<AdgisticsMotorsReport.DealershipData>
 
 <h2>Top Performing dealerships</h2>
-<ul>
-    @if (Model != null)
-    {
-        foreach (var dealershipData in Model)
+
+@if (Model != null)
+{
+    <table align="center" border="1">
+        <tr>
+            <th>
+                Dealership Identifier
+            </th>
+            <th>
+                Total Sales
+            </th>
+            <th>
+                Available Stock
+            </th>
+        </tr>
+
+        @foreach (var dealershipData in Model)
         {
-            <li>@dealershipData.DealershipIdentifier</li>
-            <li>@dealershipData.TotalSales</li>
-            <li>@dealershipData.AvailableStock</li>
+            <tr>
+                <td>@dealershipData.DealershipIdentifier</td>
+                <td>@dealershipData.TotalSales</td>
+                <td>@dealershipData.AvailableStock</td>
+            </tr>
         }
-    }
-</ul>
+    </table>
+}

@@ -146,6 +146,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\TopPerformingDealerShips.cshtml" />
     <Content Include="Views\Home\LowStockDealerShips.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

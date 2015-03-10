@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using AdgisticsMotors.Web.Services.Interfaces;
 using AdgisticsMotorsReport;
 using AdgisticsMotorsReport.Utils.Threading;
@@ -16,10 +11,8 @@ namespace AdgisticsMotors.Web.Services
     public class ReportsService : IReportsService
     {
         IList<IWork> workList;
-        BackgroundWorkerQueue backgroundWorkerQueue = new BackgroundWorkerQueue(99);
+        BackgroundWorkerQueue backgroundWorkerQueue = new BackgroundWorkerQueue(1);
         ConcurrentBag<DealershipData> concurrentBag = new ConcurrentBag<DealershipData>();
-        private bool semaphore = true;
-        IList<IWork> failedList = new List<IWork>();
 
         private IDealershipsLoaderService _dealershipsLoaderService;
 
@@ -44,27 +37,28 @@ namespace AdgisticsMotors.Web.Services
             }
             catch (ArgumentException exception)
             {
-                System.Diagnostics.Debug.WriteLine(exception.ToString());
+                System.Diagnostics.Debug.WriteLine(exception.ToString()); //This should be changed to inform user about exception
                 throw;
             }
 
             var status = backgroundWorkerQueue.Status();
-            while (status.Backlog.Count() > 0)
+            while (status.Backlog.Any() || status.Processing.Any())
             {
-                if (failedList.Count() > 0)
-                {
-                    backgroundWorkerQueue.ReAddFailed(failedList);
-                    failedList.Clear();
-                }
+                status = backgroundWorkerQueue.Status();
             }
-            var list = concurrentBag.ToList();
-            return list;
+            if(status.Failed.Any())
+            {
+                backgroundWorkerQueue.ReAddFailed(status.Failed);
+                status = backgroundWorkerQueue.Status();
+            }
+            backgroundWorkerQueue.Dispose();
+
+            return concurrentBag.ToList();
         }
 
         private void backgroundWorkerQueue_WorkFailed(object sender, WorkFailedProcessingEventArgs e)
         {
             System.Diagnostics.Debug.WriteLine(e.Message.ToString());
-            failedList.Add(e.Work);
         }
 
         private void backgroundWorkerQueue_WorkSucceeded(object sender, WorkSucceededProcessingEventArgs e)
@@ -72,7 +66,6 @@ namespace AdgisticsMotors.Web.Services
             var result = (e.Work as TopPerformingDealershipsWork).DealershipData;
             
             concurrentBag.Add(result);
-            semaphore = false;
         }
 
         public IList<DealershipData> LowStockDealerships(int availableStock)
@@ -83,9 +76,9 @@ namespace AdgisticsMotors.Web.Services
 
     public class TopPerformingDealershipsWork : IWork
     {
-        private readonly DealershipService _dealershipService;
         private readonly string _id;
         private readonly Uri _uri;
+        private readonly DealershipService _dealershipService;
         public DealershipData DealershipData { get; private set; }
 
         public TopPerformingDealershipsWork(string id, Uri uri)
