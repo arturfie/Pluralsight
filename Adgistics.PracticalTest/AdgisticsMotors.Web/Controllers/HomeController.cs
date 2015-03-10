@@ -8,7 +8,6 @@ namespace AdgisticsMotors.Web.Controllers
 
     public class HomeController : Controller
     {
-        
         private readonly IReportsService _reportsService;
 
         public HomeController() { }
@@ -32,7 +31,9 @@ namespace AdgisticsMotors.Web.Controllers
 
         public ActionResult LowStockDealerShips()
         {
-            return View();
+            var model = _reportsService.LowStockDealerships();
+
+            return View(model);
         }
 
         protected override void OnException(ExceptionContext filterContext)

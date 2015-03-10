@@ -18,7 +18,7 @@ namespace AdgisticsMotors.Web.Services
             {
                 foreach (string line in File.ReadLines(AppDomain.CurrentDomain.SetupInformation.PrivateBinPath + "\\DealershipsList.txt"))
                 {
-                    if (dealershipList.Count() > 100)
+                    if (dealershipList.Count() > 1000)
                     {
                         break;
                     }

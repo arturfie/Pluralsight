@@ -4,7 +4,7 @@
 
 @if (Model != null)
 {
-    <table align="center" border="1">
+    <table border="1">
         <tr>
             <th>
                 Dealership Identifier
@@ -19,7 +19,7 @@
 
         @foreach (var dealershipData in Model)
         {
-            <tr>
+            <tr align="center">
                 <td>@dealershipData.DealershipIdentifier</td>
                 <td>@dealershipData.TotalSales</td>
                 <td>@dealershipData.AvailableStock</td>

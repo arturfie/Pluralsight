@@ -10,6 +10,6 @@ namespace AdgisticsMotors.Web.Services.Interfaces
     public interface IReportsService
     {
         IList<DealershipData> TopPerformingDealerships();
-        IList<DealershipData> LowStockDealerships(int availableStock);
+        IList<DealershipData> LowStockDealerships();
     }
 }
