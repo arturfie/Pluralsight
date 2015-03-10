@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.EnterpriseServices;
 using System.Linq;
+using AdgisticsMotors.Web.Models;
 using AdgisticsMotors.Web.Services.Interfaces;
 using AdgisticsMotorsReport;
 using AdgisticsMotorsReport.Utils.Threading;
@@ -10,9 +12,8 @@ namespace AdgisticsMotors.Web.Services
 {
     public class ReportsService : IReportsService
     {
-        IList<IWork> workList;
-        BackgroundWorkerQueue backgroundWorkerQueue = new BackgroundWorkerQueue(1);
-        ConcurrentBag<DealershipData> concurrentBag = new ConcurrentBag<DealershipData>();
+        private readonly BackgroundWorkerQueue _backgroundWorkerQueue = new BackgroundWorkerQueue(99);
+        private readonly ConcurrentQueue<DealershipData> _concurrentBag = new ConcurrentQueue<DealershipData>();
 
         private IDealershipsLoaderService _dealershipsLoaderService;
 
@@ -20,52 +21,61 @@ namespace AdgisticsMotors.Web.Services
         {
             _dealershipsLoaderService = dealershipsLoaderService;
 
-            backgroundWorkerQueue.WorkSucceeded += backgroundWorkerQueue_WorkSucceeded;
-            backgroundWorkerQueue.WorkFailed += backgroundWorkerQueue_WorkFailed;
+            _backgroundWorkerQueue.WorkSucceeded += backgroundWorkerQueue_WorkSucceeded;
+            _backgroundWorkerQueue.WorkFailed += backgroundWorkerQueue_WorkFailed;
         }
 
         public IList<DealershipData> TopPerformingDealerships()
         {
-            var dealershipsList = _dealershipsLoaderService.LoadServices();
+            var dealershipsQueue = new Queue<DealershipInfo>(_dealershipsLoaderService.LoadServices());
 
             try
             {
-                foreach (var dealershipData in dealershipsList)
+                foreach (var dealershipData in dealershipsQueue)
                 {
-                    backgroundWorkerQueue.Enqueue((new TopPerformingDealershipsWork(dealershipData.Id, dealershipData.Uri)));
+                    _backgroundWorkerQueue.Enqueue((new TopPerformingDealershipsWork(dealershipData.Id, dealershipData.Uri)));
                 }
+                ProcessTopDealersWork();
             }
             catch (ArgumentException exception)
             {
-                System.Diagnostics.Debug.WriteLine(exception.ToString()); //This should be changed to inform user about exception
+                //_logger.Log(exception.Message);
                 throw;
             }
+            finally
+            {
+                _backgroundWorkerQueue.Dispose();
+            }
 
-            var status = backgroundWorkerQueue.Status();
+            return _concurrentBag.ToList();
+        }
+
+
+
+        private void ProcessTopDealersWork()
+        {
+            var status = _backgroundWorkerQueue.Status();
             while (status.Backlog.Any() || status.Processing.Any())
             {
-                status = backgroundWorkerQueue.Status();
+                status = _backgroundWorkerQueue.Status();
             }
-            if(status.Failed.Any())
+            if (status.Failed.Any())
             {
-                backgroundWorkerQueue.ReAddFailed(status.Failed);
-                status = backgroundWorkerQueue.Status();
+                _backgroundWorkerQueue.ReAddFailed(status.Failed);
+                ProcessTopDealersWork();
             }
-            backgroundWorkerQueue.Dispose();
-
-            return concurrentBag.ToList();
         }
 
         private void backgroundWorkerQueue_WorkFailed(object sender, WorkFailedProcessingEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine(e.Message.ToString());
+            System.Diagnostics.Debug.WriteLine(e.Message);
+            //_logger.Log(e.Message);
         }
 
         private void backgroundWorkerQueue_WorkSucceeded(object sender, WorkSucceededProcessingEventArgs e)
         {
             var result = (e.Work as TopPerformingDealershipsWork).DealershipData;
-            
-            concurrentBag.Add(result);
+            _concurrentBag.Enqueue(result);
         }
 
         public IList<DealershipData> LowStockDealerships(int availableStock)

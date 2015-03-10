@@ -14,17 +14,45 @@ namespace AdgisticsMotors.Web.Services
         {
             IList<DealershipInfo> dealershipList = new List<DealershipInfo>();
 
-            foreach (string line in File.ReadLines(AppDomain.CurrentDomain.SetupInformation.PrivateBinPath + "\\DealershipsList.txt"))
+            try
             {
-                if (dealershipList.Count() > 100)
+                foreach (string line in File.ReadLines(AppDomain.CurrentDomain.SetupInformation.PrivateBinPath + "\\DealershipsList.txt"))
                 {
-                    break;
+                    if (dealershipList.Count() > 100)
+                    {
+                        break;
+                    }
+                    var lineSplited = line.Split(',');
+
+                    dealershipList.Add(new DealershipInfo(lineSplited[0], new Uri(lineSplited[1])));
                 }
-                var lineSplited = line.Split(',');
-
-                dealershipList.Add(new DealershipInfo(lineSplited[0], new Uri(lineSplited[1])));
             }
-
+            //I would inject logger service to log exceptions into database
+            //catch (UnauthorizedAccessException UAEx)
+            //{
+            //    _logger.Log(UAEx.Message);
+            //    throw 
+            //}
+            //catch (PathTooLongException PathEx)
+            //{
+            //    _logger.Log(PathEx.Message);
+            //    throw 
+            //}
+            //catch (PathTooLongException PathEx)
+            //{
+            //    _logger.Log(PathEx.Message);
+            //    throw 
+            //}
+            //catch (UriFormatException UriEx)
+            //{
+            //    _logger.Log(.Message);
+            //    throw 
+            //}
+            catch (Exception exception)
+            {
+            //  _logger.Log(exception.Message);
+                throw;
+            }
             return dealershipList;
         }
     }
