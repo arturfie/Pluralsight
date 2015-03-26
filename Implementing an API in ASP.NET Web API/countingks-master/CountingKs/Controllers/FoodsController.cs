@@ -21,7 +21,7 @@ namespace CountingKs.Controllers
             _modelFactory = new ModelFactory();
         }
 
-        public IEnumerable<FoodModel> Get()
+        public IEnumerable<object> Get()
         {
             var results = _repo.GetAllFoodsWithMeasures()
                               .OrderBy(f => f.Description)
