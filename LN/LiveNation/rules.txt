@@ -1,5 +1,0 @@
-﻿<appSettings>
-  <add key="3" value="fizz"/>
-  <add key="5" value="fizz"/>
-
-</appSettings>
