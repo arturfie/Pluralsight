@@ -8,6 +8,8 @@ namespace ConsoleApplication
 {
     class Program
     {
+        private delegate void testDelegate(string value);
+
         static void Main(string[] args)
         {
             Document doc = new Document();
@@ -20,8 +22,11 @@ namespace ConsoleApplication
             var emailSender = new EmailSender();
             var emailDelegate = new Document.SendDoc(emailSender.SendEmail);
             doc.ReportSendingResult(emailDelegate);
-            Console.ReadKey();
 
+            testDelegate testDelegateInstance = value => Console.WriteLine(value);
+            testDelegateInstance.Invoke("This is Test");
+            
+            Console.ReadKey();
         }
     }
 }
